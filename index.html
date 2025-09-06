@@ -27,12 +27,27 @@
       cursor: pointer;
       font-size: 20px;
       user-select: none;
+      position: relative;
     }
     #captcha-box input[type="checkbox"] {
       margin-right: 12px;
       width: 25px;
       height: 25px;
       cursor: pointer;
+    }
+    #spinner {
+      display: none;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #4CAF50;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      margin-left: 10px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
     button {
       padding: 12px 25px;
@@ -57,6 +72,8 @@
       font-size: 18px;
       color: #555;
     }
+
+    /* Media query cho mobile nhỏ */
     @media (max-width: 600px) {
       #captcha-box {
         padding: 40px 20px;
@@ -67,6 +84,10 @@
       #captcha-box input[type="checkbox"] {
         width: 30px;
         height: 30px;
+      }
+      #spinner {
+        width: 25px;
+        height: 25px;
       }
       button {
         font-size: 20px;
@@ -85,6 +106,7 @@
   <label>
     <input type="checkbox" id="captcha-checkbox">
     Tôi không phải là robot
+    <div id="spinner"></div>
   </label>
   <br>
   <button onclick="checkCaptcha()">Xác nhận</button>
@@ -93,17 +115,14 @@
 </div>
 
 <script>
-  // =========================
   // Link đã mã hóa Base64
-  // =========================
-  const encodedURL = "aHR0cHM6Ly9ub3Rldm4uY29tL3NoYXJlL2JxMWpkd2Q0"; // Base64 của https://notevn.com/share/bq1jdwd4
+  const encodedURL = "aHR0cHM6Ly9ub3Rldm4uY29tL3NoYXJlL2JxMWpkd2Q0";
 
-  // Decode Base64
   function decodeURL(encoded) {
     return atob(encoded);
   }
 
-  const timeoutSeconds = 60; // Thời gian tối đa để tích captcha
+  const timeoutSeconds = 60; 
   let remaining = timeoutSeconds;
 
   const timerEl = document.getElementById("timer");
@@ -117,16 +136,30 @@
     }
   }, 1000);
 
-  function checkCaptcha() {
-    const checkbox = document.getElementById("captcha-checkbox");
-    const message = document.getElementById("message");
+  const checkbox = document.getElementById("captcha-checkbox");
+  const spinner = document.getElementById("spinner");
 
+  // Khi người dùng tích checkbox
+  checkbox.addEventListener("change", function() {
+    if(checkbox.checked){
+      spinner.style.display = "inline-block"; // hiện vòng quay
+      checkbox.disabled = true; // tạm khóa checkbox
+      setTimeout(() => {
+        spinner.style.display = "none";
+        checkbox.checked = true; // giữ tích xanh
+        checkbox.disabled = false;
+      }, 2000); // thời gian xác thực 2 giây
+    }
+  });
+
+  function checkCaptcha() {
+    const message = document.getElementById("message");
     if(checkbox.checked){
       clearInterval(countdown);
       message.style.color = "green";
       message.textContent = "Đang chuyển hướng trong 3 giây...";
       setTimeout(() => {
-        const mainURL = decodeURL(encodedURL); // Giải mã trước khi redirect
+        const mainURL = decodeURL(encodedURL);
         window.location.href = mainURL;
       }, 3000);
     } else {
@@ -135,9 +168,7 @@
     }
   }
 
-  // =========================
   // Chặn DevTools + chuột phải
-  // =========================
   document.addEventListener("keydown", function(e) {
     if(e.key === "F12") e.preventDefault();
     if(e.ctrlKey && e.shiftKey && e.key === "I") e.preventDefault();
