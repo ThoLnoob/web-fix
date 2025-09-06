@@ -2,33 +2,81 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Captcha Web</title>
+  <title>Tho Lnoob Update</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      padding-top: 100px;
+      padding-top: 50px;
       background-color: #f0f0f0;
+      margin: 0;
     }
     #captcha-box {
-      display: inline-block;
-      background: white;
+      width: 90%;
+      max-width: 400px;
       padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.25);
+      margin: 0 auto;
     }
-    input {
-      padding: 5px;
-      font-size: 16px;
+    #captcha-box label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-size: 20px;
+      user-select: none;
+    }
+    #captcha-box input[type="checkbox"] {
+      margin-right: 12px;
+      width: 25px;
+      height: 25px;
+      cursor: pointer;
     }
     button {
-      padding: 5px 15px;
-      font-size: 16px;
-      margin-left: 5px;
+      padding: 12px 25px;
+      font-size: 18px;
+      margin-top: 20px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      background-color: #4CAF50;
+      color: white;
+    }
+    button:hover {
+      background-color: #45a049;
     }
     #message {
       margin-top: 15px;
       font-weight: bold;
+      font-size: 18px;
+    }
+    #timer {
+      margin-top: 10px;
+      font-size: 18px;
+      color: #555;
+    }
+
+    /* Media query cho mobile nhỏ */
+    @media (max-width: 600px) {
+      #captcha-box {
+        padding: 40px 20px;
+      }
+      #captcha-box label {
+        font-size: 22px;
+      }
+      #captcha-box input[type="checkbox"] {
+        width: 30px;
+        height: 30px;
+      }
+      button {
+        font-size: 20px;
+        padding: 14px 30px;
+      }
+      #timer {
+        font-size: 20px;
+      }
     }
   </style>
 </head>
@@ -36,60 +84,59 @@
 
 <div id="captcha-box">
   <h2>Xác thực CAPTCHA</h2>
-  <p>Nhập kết quả: <span id="num1"></span> + <span id="num2"></span> = ?</p>
-  <input type="number" id="captcha-input" placeholder="Kết quả">
+  <label>
+    <input type="checkbox" id="captcha-checkbox">
+    Tôi không phải là robot
+  </label>
+  <br>
   <button onclick="checkCaptcha()">Xác nhận</button>
   <div id="message"></div>
+  <div id="timer"></div>
 </div>
 
 <script>
-  // ===========================
-  // Cấu hình web chính
-  // ===========================
-  const mainURL = "https://notevn.com/share/bq1jdwd4"; // Thay bằng web chính
+  const mainURL = "https://notevn.com/share/bq1jdwd4"; // Thay bằng link web chính của bạn
+  const timeoutSeconds = 60; // Thời gian tối đa để tích captcha
+  let remaining = timeoutSeconds;
 
-  // ===========================
-  // CAPTCHA đơn giản
-  // ===========================
-  const num1 = Math.floor(Math.random() * 10 + 1);
-  const num2 = Math.floor(Math.random() * 10 + 1);
-  document.getElementById("num1").textContent = num1;
-  document.getElementById("num2").textContent = num2;
+  const timerEl = document.getElementById("timer");
+  const countdown = setInterval(() => {
+    remaining--;
+    timerEl.textContent = "Hết hạn sau: " + remaining + " giây";
+    if(remaining <= 0){
+      clearInterval(countdown);
+      alert("Captcha hết hạn. Vui lòng tải lại trang để xác thực lại.");
+      location.reload();
+    }
+  }, 1000);
 
   function checkCaptcha() {
-    const input = parseInt(document.getElementById("captcha-input").value);
+    const checkbox = document.getElementById("captcha-checkbox");
     const message = document.getElementById("message");
 
-    if(input === num1 + num2) {
+    if(checkbox.checked){
+      clearInterval(countdown);
       message.style.color = "green";
-      message.textContent = "Đúng! Chuyển hướng trong 3 giây...";
+      message.textContent = "Đang chuyển hướng trong 3 giây...";
       setTimeout(() => {
         window.location.href = mainURL;
       }, 3000);
     } else {
       message.style.color = "red";
-      message.textContent = "Sai, thử lại!";
+      message.textContent = "Vui lòng tích vào ô";
     }
   }
 
-  // ===========================
+  // =========================
   // Chặn DevTools + chuột phải
-  // ===========================
+  // =========================
   document.addEventListener("keydown", function(e) {
-    // F12
     if(e.key === "F12") e.preventDefault();
-    // Ctrl+Shift+I
     if(e.ctrlKey && e.shiftKey && e.key === "I") e.preventDefault();
-    // Ctrl+Shift+J
     if(e.ctrlKey && e.shiftKey && e.key === "J") e.preventDefault();
-    // Ctrl+U
     if(e.ctrlKey && e.key === "u") e.preventDefault();
   });
-
-  // Chặn chuột phải
-  document.addEventListener("contextmenu", function(e){
-    e.preventDefault();
-  });
+  document.addEventListener("contextmenu", function(e){ e.preventDefault(); });
 </script>
 
 </body>
