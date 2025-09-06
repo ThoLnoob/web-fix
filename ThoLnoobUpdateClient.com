@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Captcha Web</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 100px;
+      background-color: #f0f0f0;
+    }
+    #captcha-box {
+      display: inline-block;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    input {
+      padding: 5px;
+      font-size: 16px;
+    }
+    button {
+      padding: 5px 15px;
+      font-size: 16px;
+      margin-left: 5px;
+    }
+    #message {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div id="captcha-box">
+  <h2>Xác thực CAPTCHA</h2>
+  <p>Nhập kết quả: <span id="num1"></span> + <span id="num2"></span> = ?</p>
+  <input type="number" id="captcha-input" placeholder="Kết quả">
+  <button onclick="checkCaptcha()">Xác nhận</button>
+  <div id="message"></div>
+</div>
+
+<script>
+  // ===========================
+  // Cấu hình web chính
+  // ===========================
+  const mainURL = "https://example.com"; // Thay bằng web chính
+
+  // ===========================
+  // CAPTCHA đơn giản
+  // ===========================
+  const num1 = Math.floor(Math.random() * 10 + 1);
+  const num2 = Math.floor(Math.random() * 10 + 1);
+  document.getElementById("num1").textContent = num1;
+  document.getElementById("num2").textContent = num2;
+
+  function checkCaptcha() {
+    const input = parseInt(document.getElementById("captcha-input").value);
+    const message = document.getElementById("message");
+
+    if(input === num1 + num2) {
+      message.style.color = "green";
+      message.textContent = "Đúng! Chuyển hướng trong 3 giây...";
+      setTimeout(() => {
+        window.location.href = mainURL;
+      }, 3000);
+    } else {
+      message.style.color = "red";
+      message.textContent = "Sai, thử lại!";
+    }
+  }
+
+  // ===========================
+  // Chặn DevTools + chuột phải
+  // ===========================
+  document.addEventListener("keydown", function(e) {
+    // F12
+    if(e.key === "F12") e.preventDefault();
+    // Ctrl+Shift+I
+    if(e.ctrlKey && e.shiftKey && e.key === "I") e.preventDefault();
+    // Ctrl+Shift+J
+    if(e.ctrlKey && e.shiftKey && e.key === "J") e.preventDefault();
+    // Ctrl+U
+    if(e.ctrlKey && e.key === "u") e.preventDefault();
+  });
+
+  // Chặn chuột phải
+  document.addEventListener("contextmenu", function(e){
+    e.preventDefault();
+  });
+</script>
+
+</body>
+</html>
