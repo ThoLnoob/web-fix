@@ -56,10 +56,14 @@
       cursor: pointer;
       border: none;
       border-radius: 8px;
-      background-color: #4CAF50;
+      background-color: grey; /* mặc định xám */
       color: white;
     }
-    button:hover {
+    button.enabled {
+      background-color: #4CAF50; /* xanh khi sẵn sàng */
+      cursor: pointer;
+    }
+    button.enabled:hover {
       background-color: #45a049;
     }
     #message {
@@ -107,18 +111,15 @@
     <div id="spinner"></div>
   </label>
   <br>
-  <button onclick="checkCaptcha()">Xác nhận</button>
+  <button id="verify-btn" disabled>Xác nhận</button>
   <div id="message"></div>
   <div id="timer"></div>
 </div>
 
 <script>
-  // Link đã mã hóa Base64
-const encodedURL = "aHR0cHM6Ly9ub3Rldm4uY29tL3NoYXJlL2RlMXY1cjQw"; // Base64 của https://notevn.com/share/de1v5r40
-
-  function decodeURL(encoded) {
-    return atob(encoded);
-  }
+  // Link mã hóa Base64
+  const encodedURL = "aHR0cHM6Ly9ub3Rldm4uY29tL3NoYXJlL2RlMXY1cjQw";
+  function decodeURL(encoded) { return atob(encoded); }
 
   const timeoutSeconds = 60; 
   let remaining = timeoutSeconds;
@@ -136,35 +137,43 @@ const encodedURL = "aHR0cHM6Ly9ub3Rldm4uY29tL3NoYXJlL2RlMXY1cjQw"; // Base64 c�
 
   const checkbox = document.getElementById("captcha-checkbox");
   const spinner = document.getElementById("spinner");
+  const verifyBtn = document.getElementById("verify-btn");
+  const message = document.getElementById("message");
 
-  // Khi người dùng tích checkbox
+  // Khi tích checkbox
   checkbox.addEventListener("change", function() {
     if(checkbox.checked){
       spinner.style.display = "inline-block"; // hiện vòng quay
-      checkbox.disabled = true; // tạm khóa checkbox
+      checkbox.disabled = true; // khóa checkbox trong lúc xoay
+      verifyBtn.disabled = true; // nút vẫn tắt
+      verifyBtn.classList.remove("enabled");
       setTimeout(() => {
-        spinner.style.display = "none"; // ẩn vòng quay
-        checkbox.checked = true;        // giữ tích xanh
-        checkbox.disabled = false;      // mở lại checkbox
+        spinner.style.display = "none"; // tắt vòng quay
+        checkbox.disabled = false;
+        verifyBtn.disabled = false; // bật nút
+        verifyBtn.classList.add("enabled");
       }, 2000); // thời gian xác thực 2 giây
+    } else {
+      verifyBtn.disabled = true; // khóa nút lại
+      verifyBtn.classList.remove("enabled");
     }
   });
 
-  function checkCaptcha() {
-    const message = document.getElementById("message");
+  // Khi bấm nút xác nhận
+  verifyBtn.addEventListener("click", () => {
+    if(verifyBtn.disabled) return; // nếu chưa bật, bỏ qua
     if(checkbox.checked){
       clearInterval(countdown);
       message.style.color = "green";
       message.textContent = "Đang chuyển hướng trong 3 giây...";
       setTimeout(() => {
-        const mainURL = decodeURL(encodedURL);
-        window.location.href = mainURL;
+        window.location.href = decodeURL(encodedURL);
       }, 3000);
     } else {
       message.style.color = "red";
-      message.textContent = "Vui lòng tích vào ô";
+      message.textContent = "Vui lòng tích vào ô trước";
     }
-  }
+  });
 
   // Chặn DevTools + chuột phải
   document.addEventListener("keydown", function(e) {
