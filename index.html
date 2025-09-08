@@ -5,49 +5,154 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Server Crash</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
     body {
-      background-color: #111;
+      background-color: #111; color: #fff; height: 100vh;
+      display: flex; justify-content: center; align-items: center;
+      text-align: center; padding: 20px; overflow: hidden;
+    }
+    .container { max-width: 600px; z-index: 1; }
+    .title {
+      font-size: 3rem; font-weight: bold; color: #ff4d4d; margin-bottom: 15px;
+    }
+    .subtitle { font-size: 1.2rem; color: #ccc; }
+    @media (max-width: 480px) {
+      .title { font-size: 2.2rem; }
+      .subtitle { font-size: 1rem; }
+    }
+
+    /* Overlay hiển thị khi phát hiện DevTools */
+    #devtools-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.95);
       color: #fff;
-      display: flex;
+      display: none; /* bật khi phát hiện */
       justify-content: center;
       align-items: center;
-      height: 100vh;
       text-align: center;
+      z-index: 9999;
       padding: 20px;
+      flex-direction: column;
     }
-    .container {
-      max-width: 600px;
+    #devtools-overlay .big {
+      font-size: 2rem;
+      color: #ff6b6b;
+      margin-bottom: 12px;
     }
-    .title {
-      font-size: 3rem;   /* chữ to nhất */
-      font-weight: bold;
-      color: #ff4d4d;    /* đỏ cảnh báo */
-      margin-bottom: 15px;
-    }
-    .subtitle {
-      font-size: 1.2rem; /* chữ nhỏ hơn */
-      color: #ccc;
-    }
-    @media (max-width: 480px) {
-      .title {
-        font-size: 2.2rem;
-      }
-      .subtitle {
-        font-size: 1rem;
-      }
-    }
+    #devtools-overlay .small { color: #ddd; font-size: 1rem; }
+
+    /* ngăn selection/context menu nhạy hơn */
+    ::selection { background: rgba(255,77,77,0.25); }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" id="main-content">
     <div class="title">Server Crash 404</div>
     <div class="subtitle">Server in Crash, please wait fixing or try another way</div>
   </div>
+
+  <!-- Overlay sẽ hiện khi phát hiện DevTools hoặc debug -->
+  <div id="devtools-overlay" role="alert" aria-live="assertive">
+    <div class="big">Thiết bị đang ở chế độ phát triển</div>
+    <div class="small">Vui lòng đóng DevTools hoặc thoát chế độ debug để tiếp tục.</div>
+  </div>
+
+  <script>
+    // --------- Chặn chuột phải ----------
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+    });
+
+    // --------- Chặn tổ hợp phím cơ bản (F12, Ctrl+Shift+I/J, Ctrl+U) ----------
+    document.addEventListener('keydown', function(e) {
+      // F12
+      if (e.key === 'F12') {
+        e.preventDefault();
+        showDevtoolsOverlay();
+        return false;
+      }
+      // Ctrl+Shift+I or Ctrl+Shift+J
+      if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) {
+        e.preventDefault();
+        showDevtoolsOverlay();
+        return false;
+      }
+      // Ctrl+U (view-source)
+      if (e.ctrlKey && e.key === 'u') {
+        e.preventDefault();
+        showDevtoolsOverlay();
+        return false;
+      }
+    });
+
+    // --------- Hiện overlay khi phát hiện DevTools mở bằng kiểm tra kích thước cửa sổ ----------
+    const overlay = document.getElementById('devtools-overlay');
+    let devtoolsOpen = false;
+
+    function showDevtoolsOverlay() {
+      // show overlay và khóa tương tác
+      overlay.style.display = 'flex';
+      // optional: bạn có thể reload trang thay vì show overlay:
+      // location.reload();
+    }
+
+    function hideDevtoolsOverlay() {
+      overlay.style.display = 'none';
+    }
+
+    // Kiểm tra thay đổi kích thước bất thường (một phương pháp phổ biến)
+    function checkDevToolsByWindowSize() {
+      // Nếu khác biệt giữa outer và inner vượt ngưỡng -> có thể mở devtools dọc/ ngang
+      const threshold = 160; // ngưỡng px (tùy chỉnh)
+      const widthDiff = Math.abs(window.outerWidth - window.innerWidth);
+      const heightDiff = Math.abs(window.outerHeight - window.innerHeight);
+      return (widthDiff > threshold || heightDiff > threshold);
+    }
+
+    // Kiểm tra debugger bằng cách đo thời gian thực thi một đoạn có "debugger" (fallback nhẹ)
+    function checkDebuggerTiming() {
+      const start = Date.now();
+      // đặt một vòng lặp ngắn; nếu DevTools mở và paused, thời gian sẽ lớn
+      for (let i = 0; i < 100000; i++) {
+        // no-op
+      }
+      const elapsed = Date.now() - start;
+      // nếu chậm quá (ví dụ > 200ms) có thể do DevTools paused/stepped
+      return (elapsed > 200);
+    }
+
+    // Kết hợp kiểm tra định kỳ
+    setInterval(function() {
+      try {
+        if (checkDevToolsByWindowSize() || checkDebuggerTiming()) {
+          if (!devtoolsOpen) {
+            devtoolsOpen = true;
+            showDevtoolsOverlay();
+          }
+        } else {
+          if (devtoolsOpen) {
+            devtoolsOpen = false;
+            hideDevtoolsOverlay();
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }, 1000);
+
+    // Ngoài ra: chặn "inspect element" bằng cách ngăn selection + clipboard copy
+    document.addEventListener('copy', function(e){
+      e.clipboardData.setData('text/plain', 'Copy not allowed');
+      e.preventDefault();
+    });
+
+    // Nếu bạn muốn reload trang khi phát hiện DevTools:
+    // function showDevtoolsOverlay() { location.reload(); }
+    // Lưu ý: reload có thể gây vòng lặp nếu DevTools vẫn mở.
+
+    // Thông báo nhẹ: đây là biện pháp client-side, không hoàn hảo.
+    // Người có kinh nghiệm vẫn có thể bypass bằng nhiều cách (disable JS, xem raw file, v.v.)
+  </script>
 </body>
 </html>
