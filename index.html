@@ -1,158 +1,197 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Server Crash</title>
+  <title>Tho Lnoob Update</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
     body {
-      background-color: #111; color: #fff; height: 100vh;
-      display: flex; justify-content: center; align-items: center;
-      text-align: center; padding: 20px; overflow: hidden;
-    }
-    .container { max-width: 600px; z-index: 1; }
-    .title {
-      font-size: 3rem; font-weight: bold; color: #ff4d4d; margin-bottom: 15px;
-    }
-    .subtitle { font-size: 1.2rem; color: #ccc; }
-    @media (max-width: 480px) {
-      .title { font-size: 2.2rem; }
-      .subtitle { font-size: 1rem; }
-    }
-
-    /* Overlay hiển thị khi phát hiện DevTools */
-    #devtools-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.95);
-      color: #fff;
-      display: none; /* bật khi phát hiện */
-      justify-content: center;
-      align-items: center;
+      font-family: Arial, sans-serif;
       text-align: center;
-      z-index: 9999;
-      padding: 20px;
-      flex-direction: column;
+      padding-top: 50px;
+      background-color: #f0f0f0;
+      margin: 0;
     }
-    #devtools-overlay .big {
-      font-size: 2rem;
-      color: #ff6b6b;
-      margin-bottom: 12px;
+    #captcha-box {
+      width: 90%;
+      max-width: 400px;
+      padding: 30px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.25);
+      margin: 0 auto;
     }
-    #devtools-overlay .small { color: #ddd; font-size: 1rem; }
-
-    /* ngăn selection/context menu nhạy hơn */
-    ::selection { background: rgba(255,77,77,0.25); }
+    #captcha-box label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-size: 20px;
+      user-select: none;
+      position: relative;
+    }
+    #captcha-box input[type="checkbox"] {
+      margin-right: 12px;
+      width: 25px;
+      height: 25px;
+      cursor: pointer;
+    }
+    #spinner {
+      display: none;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #4CAF50;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      animation: spin 1s linear infinite;
+      margin-left: 10px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    button {
+      padding: 12px 25px;
+      font-size: 18px;
+      margin-top: 20px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      background-color: grey; /* mặc định xám */
+      color: white;
+    }
+    button.enabled {
+      background-color: #4CAF50; /* xanh khi sẵn sàng */
+      cursor: pointer;
+    }
+    button.enabled:hover {
+      background-color: #45a049;
+    }
+    #message {
+      margin-top: 15px;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    #timer {
+      margin-top: 10px;
+      font-size: 18px;
+      color: #555;
+    }
+    @media (max-width: 600px) {
+      #captcha-box {
+        padding: 40px 20px;
+      }
+      #captcha-box label {
+        font-size: 22px;
+      }
+      #captcha-box input[type="checkbox"] {
+        width: 30px;
+        height: 30px;
+      }
+      #spinner {
+        width: 30px;
+        height: 30px;
+      }
+      button {
+        font-size: 20px;
+        padding: 14px 30px;
+      }
+      #timer {
+        font-size: 20px;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="container" id="main-content">
-    <div class="title">Server Crash 404</div>
-    <div class="subtitle">Server in Crash, please wait fixing or try another way</div>
+
+<div id="captcha-box">
+  <h2>Xác thực CAPTCHA</h2>
+  <label>
+    <input type="checkbox" id="captcha-checkbox">
+    Tôi không phải là robot
+    <div id="spinner"></div>
+  </label>
+  <br>
+  <button id="verify-btn" disabled>Xác nhận</button>
+  <div id="message"></div>
+  <div id="timer"></div>
+
+  <!-- 🔹 Khung quảng cáo minh họa -->
+  <div id="ad-box">
+    <p><strong>Quảng cáo</strong></p>
+    <img src="https://via.placeholder.com/320x100?text=Banner+Ad" alt="Ad Banner">
+    <p style="font-size: 14px; color: gray;">(Ads)</p>
   </div>
+</div>
 
-  <!-- Overlay sẽ hiện khi phát hiện DevTools hoặc debug -->
-  <div id="devtools-overlay" role="alert" aria-live="assertive">
-    <div class="big">Thiết bị đang ở chế độ phát triển</div>
-    <div class="small">Vui lòng đóng DevTools hoặc thoát chế độ debug để tiếp tục.</div>
-  </div>
 
-  <script>
-    // --------- Chặn chuột phải ----------
-    document.addEventListener('contextmenu', function(e) {
-      e.preventDefault();
-    });
+<script>
+  // Link mã hóa Base64
+  const encodedURL = "aHR0cHM6Ly9ub3Rldm4uY29tL3NoYXJlL2RlMXY1cjQw";
+  function decodeURL(encoded) { return atob(encoded); }
 
-    // --------- Chặn tổ hợp phím cơ bản (F12, Ctrl+Shift+I/J, Ctrl+U) ----------
-    document.addEventListener('keydown', function(e) {
-      // F12
-      if (e.key === 'F12') {
-        e.preventDefault();
-        showDevtoolsOverlay();
-        return false;
-      }
-      // Ctrl+Shift+I or Ctrl+Shift+J
-      if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) {
-        e.preventDefault();
-        showDevtoolsOverlay();
-        return false;
-      }
-      // Ctrl+U (view-source)
-      if (e.ctrlKey && e.key === 'u') {
-        e.preventDefault();
-        showDevtoolsOverlay();
-        return false;
-      }
-    });
+  const timeoutSeconds = 60; 
+  let remaining = timeoutSeconds;
 
-    // --------- Hiện overlay khi phát hiện DevTools mở bằng kiểm tra kích thước cửa sổ ----------
-    const overlay = document.getElementById('devtools-overlay');
-    let devtoolsOpen = false;
-
-    function showDevtoolsOverlay() {
-      // show overlay và khóa tương tác
-      overlay.style.display = 'flex';
-      // optional: bạn có thể reload trang thay vì show overlay:
-      // location.reload();
+  const timerEl = document.getElementById("timer");
+  const countdown = setInterval(() => {
+    remaining--;
+    timerEl.textContent = "Hết hạn sau: " + remaining + " giây";
+    if(remaining <= 0){
+      clearInterval(countdown);
+      alert("Captcha hết hạn. Vui lòng tải lại trang để xác thực lại.");
+      location.reload();
     }
+  }, 1000);
 
-    function hideDevtoolsOverlay() {
-      overlay.style.display = 'none';
+  const checkbox = document.getElementById("captcha-checkbox");
+  const spinner = document.getElementById("spinner");
+  const verifyBtn = document.getElementById("verify-btn");
+  const message = document.getElementById("message");
+
+  // Khi tích checkbox
+  checkbox.addEventListener("change", function() {
+    if(checkbox.checked){
+      spinner.style.display = "inline-block"; // hiện vòng quay
+      checkbox.disabled = true; // khóa checkbox trong lúc xoay
+      verifyBtn.disabled = true; // nút vẫn tắt
+      verifyBtn.classList.remove("enabled");
+      setTimeout(() => {
+        spinner.style.display = "none"; // tắt vòng quay
+        checkbox.disabled = false;
+        verifyBtn.disabled = false; // bật nút
+        verifyBtn.classList.add("enabled");
+      }, 2000); // thời gian xác thực 2 giây
+    } else {
+      verifyBtn.disabled = true; // khóa nút lại
+      verifyBtn.classList.remove("enabled");
     }
+  });
 
-    // Kiểm tra thay đổi kích thước bất thường (một phương pháp phổ biến)
-    function checkDevToolsByWindowSize() {
-      // Nếu khác biệt giữa outer và inner vượt ngưỡng -> có thể mở devtools dọc/ ngang
-      const threshold = 160; // ngưỡng px (tùy chỉnh)
-      const widthDiff = Math.abs(window.outerWidth - window.innerWidth);
-      const heightDiff = Math.abs(window.outerHeight - window.innerHeight);
-      return (widthDiff > threshold || heightDiff > threshold);
+  // Khi bấm nút xác nhận
+  verifyBtn.addEventListener("click", () => {
+    if(verifyBtn.disabled) return; // nếu chưa bật, bỏ qua
+    if(checkbox.checked){
+      clearInterval(countdown);
+      message.style.color = "green";
+      message.textContent = "Đang chuyển hướng trong 3 giây...";
+      setTimeout(() => {
+        window.location.href = decodeURL(encodedURL);
+      }, 3000);
+    } else {
+      message.style.color = "red";
+      message.textContent = "Vui lòng tích vào ô trước";
     }
+  });
 
-    // Kiểm tra debugger bằng cách đo thời gian thực thi một đoạn có "debugger" (fallback nhẹ)
-    function checkDebuggerTiming() {
-      const start = Date.now();
-      // đặt một vòng lặp ngắn; nếu DevTools mở và paused, thời gian sẽ lớn
-      for (let i = 0; i < 100000; i++) {
-        // no-op
-      }
-      const elapsed = Date.now() - start;
-      // nếu chậm quá (ví dụ > 200ms) có thể do DevTools paused/stepped
-      return (elapsed > 200);
-    }
+  // Chặn DevTools + chuột phải
+  document.addEventListener("keydown", function(e) {
+    if(e.key === "F12") e.preventDefault();
+    if(e.ctrlKey && e.shiftKey && e.key === "I") e.preventDefault();
+    if(e.ctrlKey && e.shiftKey && e.key === "J") e.preventDefault();
+    if(e.ctrlKey && e.key === "u") e.preventDefault();
+  });
+  document.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+</script>
 
-    // Kết hợp kiểm tra định kỳ
-    setInterval(function() {
-      try {
-        if (checkDevToolsByWindowSize() || checkDebuggerTiming()) {
-          if (!devtoolsOpen) {
-            devtoolsOpen = true;
-            showDevtoolsOverlay();
-          }
-        } else {
-          if (devtoolsOpen) {
-            devtoolsOpen = false;
-            hideDevtoolsOverlay();
-          }
-        }
-      } catch (e) {
-        // ignore
-      }
-    }, 1000);
-
-    // Ngoài ra: chặn "inspect element" bằng cách ngăn selection + clipboard copy
-    document.addEventListener('copy', function(e){
-      e.clipboardData.setData('text/plain', 'Copy not allowed');
-      e.preventDefault();
-    });
-
-    // Nếu bạn muốn reload trang khi phát hiện DevTools:
-    // function showDevtoolsOverlay() { location.reload(); }
-    // Lưu ý: reload có thể gây vòng lặp nếu DevTools vẫn mở.
-
-    // Thông báo nhẹ: đây là biện pháp client-side, không hoàn hảo.
-    // Người có kinh nghiệm vẫn có thể bypass bằng nhiều cách (disable JS, xem raw file, v.v.)
-  </script>
 </body>
 </html>
