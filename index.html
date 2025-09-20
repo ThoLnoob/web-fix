@@ -164,7 +164,7 @@
   const timerEl = document.getElementById("timer");
   const countdown = setInterval(() => {
     remaining--;
-    timerEl.textContent = "expires later: " + remaining + " giây";
+    timerEl.textContent = "expires later: " + remaining + "Seconds";
     if(remaining <= 0){
       clearInterval(countdown);
       alert("Captcha expired. Please reload the page to re-authenticate.");
