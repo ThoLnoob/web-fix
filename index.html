@@ -135,19 +135,19 @@
 <body>
 
 <div id="captcha-box">
-  <h2>Xác thực CAPTCHA</h2>
+  <h2>Verify CAPTCHA</h2>
   <label>
     <input type="checkbox" id="captcha-checkbox">
-    Tôi không phải là robot
+       I am not a robot
     <div id="spinner"></div>
   </label>
-  <button id="verify-btn" disabled>Xác nhận</button>
+  <button id="verify-btn" disabled>Continue</button>
   <div id="message"></div>
   <div id="timer"></div>
 
-  <!-- 🔹 Quảng cáo -->
+  <!-- 🔹 Ads -->
   <div id="ad-box">
-    <p><strong>Quảng cáo</strong></p>
+    <p><strong>Ads</strong></p>
     <img src="https://via.placeholder.com/320x100?text=Banner+Ad" alt="Ad Banner">
     <p>©Made by Tho Lnoob</p>
   </div>
@@ -164,10 +164,10 @@
   const timerEl = document.getElementById("timer");
   const countdown = setInterval(() => {
     remaining--;
-    timerEl.textContent = "Hết hạn sau: " + remaining + " giây";
+    timerEl.textContent = "expires later: " + remaining + " giây";
     if(remaining <= 0){
       clearInterval(countdown);
-      alert("Captcha hết hạn. Vui lòng tải lại trang để xác thực lại.");
+      alert("Captcha expired. Please reload the page to re-authenticate.");
       location.reload();
     }
   }, 1000);
@@ -201,7 +201,7 @@
     if(verifyBtn.disabled) return;
     if(checkbox.checked){
       clearInterval(countdown);
-      message.textContent = "Đang chuyển hướng trong 3 giây...";
+      message.textContent = "Wait 3 seconds...";
       setTimeout(() => {
         window.location.href = decodeURL(encodedURL);
       }, 3000);
