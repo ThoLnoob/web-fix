@@ -208,14 +208,42 @@
     }
   });
 
-  // Chặn DevTools + chuột phải
-  document.addEventListener("keydown", function(e) {
-    if(e.key === "F12") e.preventDefault();
-    if(e.ctrlKey && e.shiftKey && e.key === "I") e.preventDefault();
-    if(e.ctrlKey && e.shiftKey && e.key === "J") e.preventDefault();
-    if(e.ctrlKey && e.key === "u") e.preventDefault();
-  });
-  document.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+  // Chặn DevTools + chuột phải + show big console message when user presses DevTools keys
+  (function devtoolsKeyHandler(){
+    // styled message: red text on black background, large font
+    function showDevtoolsConsoleWarning(){
+      try{
+        const style = "background: black; color: red; font-size:34px; font-weight:900; padding:14px 18px; border-radius:4px;";
+        console.log("%cSTOP OUT DEV TOOLS OR YOU GOT BAN", style);
+        // print again to make it harder to miss
+        console.log("%cSTOP OUT DEV TOOLS OR YOU GOT BAN", style);
+      }catch(e){}
+    }
+
+    document.addEventListener("keydown", function(e) {
+      // F12
+      if(e.key === "F12"){
+        e.preventDefault();
+        showDevtoolsConsoleWarning();
+        return;
+      }
+      // Ctrl+Shift+I or Ctrl+Shift+J
+      if(e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "i" || e.key === "j")){
+        e.preventDefault();
+        showDevtoolsConsoleWarning();
+        return;
+      }
+      // Ctrl+U (view source)
+      if(e.ctrlKey && (e.key === "u" || e.key === "U")){
+        e.preventDefault();
+        showDevtoolsConsoleWarning();
+        return;
+      }
+    });
+
+    // also block context menu (right click)
+    document.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+  })();
 </script>
 
 </body>
