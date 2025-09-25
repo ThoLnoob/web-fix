@@ -27,6 +27,7 @@
       box-shadow: 0 0 25px rgba(0, 255, 200, 0.7);
       text-align: center;
       animation: fadeIn 1s ease-in-out;
+      z-index: 2;
     }
 
     #captcha-box h2 {
@@ -130,6 +131,48 @@
       #captcha-box { padding: 25px 20px; }
       #captcha-box h2 { font-size: 22px; }
     }
+
+    /* 🔹 Thanh ticker chạy chữ */
+    .ticker-wrap {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 40px;
+      background: #0d1117;
+      box-shadow: 0 0 15px rgba(0, 255, 200, 0.5);
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      z-index: 10;
+      border-top: 1px solid rgba(0,255,200,0.3);
+    }
+
+    .ticker {
+      display: inline-block;
+      white-space: nowrap;
+      will-change: transform;
+      animation: marquee 15s linear infinite;
+      padding-left: 100%;
+    }
+
+    .ticker-item {
+      display: inline-block;
+      margin-right: 50px;
+      color: #fff;
+      font-size: 15px;
+    }
+
+    .ticker-item .num {
+      color: #00ffe0;
+      font-weight: bold;
+      margin: 0 6px;
+    }
+
+    @keyframes marquee {
+      0%   { transform: translateX(0%); }
+      100% { transform: translateX(-100%); }
+    }
   </style>
 </head>
 <body>
@@ -138,7 +181,7 @@
   <h2>Verify CAPTCHA</h2>
   <label>
     <input type="checkbox" id="captcha-checkbox">
-       I am not a robot
+    I am not a robot
     <div id="spinner"></div>
   </label>
   <button id="verify-btn" disabled>Continue</button>
@@ -153,6 +196,11 @@
   </div>
 </div>
 
+<!-- 🔹 Thanh ticker IP -->
+<div class="ticker-wrap">
+  <div id="ticker" class="ticker"></div>
+</div>
+
 <script>
   // Link mã hóa Base64
   const encodedURL = "aHR0cHM6Ly9ub3Rldm4uY29tL3NoYXJlL2RlMXY1cjQw";
@@ -164,7 +212,7 @@
   const timerEl = document.getElementById("timer");
   const countdown = setInterval(() => {
     remaining--;
-    timerEl.textContent = "expires later: " + remaining + "Seconds";
+    timerEl.textContent = "expires later: " + remaining + " Seconds";
     if(remaining <= 0){
       clearInterval(countdown);
       alert("Captcha expired. Please reload the page to re-authenticate.");
@@ -177,7 +225,6 @@
   const verifyBtn = document.getElementById("verify-btn");
   const message = document.getElementById("message");
 
-  // Khi tích checkbox
   checkbox.addEventListener("change", function() {
     if(checkbox.checked){
       spinner.style.display = "inline-block"; 
@@ -196,7 +243,6 @@
     }
   });
 
-  // Khi bấm nút xác nhận
   verifyBtn.addEventListener("click", () => {
     if(verifyBtn.disabled) return;
     if(checkbox.checked){
@@ -208,42 +254,42 @@
     }
   });
 
-  // Chặn DevTools + chuột phải + show big console message when user presses DevTools keys
+  // DevTools & chuột phải
   (function devtoolsKeyHandler(){
-    // styled message: red text on black background, large font
     function showDevtoolsConsoleWarning(){
       try{
-        const style = "background: black; color: red; font-size:34px; font-weight:900; padding:14px 18px; border-radius:4px;";
-        console.log("%cSTOP OUT DEV TOOLS OR YOU GOT BAN", style);
-        // print again to make it harder to miss
-        console.log("%cSTOP OUT DEV TOOLS OR YOU GOT BAN", style);
+        const style = "background:black;color:red;font-size:34px;font-weight:900;padding:14px 18px;";
+        console.log("%cBất kì người nào bảo bạn sao chép hay dán thứ gì đó ở đây đều là giả", style);
       }catch(e){}
     }
-
     document.addEventListener("keydown", function(e) {
-      // F12
-      if(e.key === "F12"){
-        e.preventDefault();
-        showDevtoolsConsoleWarning();
-        return;
-      }
-      // Ctrl+Shift+I or Ctrl+Shift+J
-      if(e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "i" || e.key === "j")){
-        e.preventDefault();
-        showDevtoolsConsoleWarning();
-        return;
-      }
-      // Ctrl+U (view source)
-      if(e.ctrlKey && (e.key === "u" || e.key === "U")){
-        e.preventDefault();
-        showDevtoolsConsoleWarning();
-        return;
+      if(e.key === "F12" || 
+         (e.ctrlKey && e.shiftKey && (e.key.toLowerCase()==="i"||e.key.toLowerCase()==="j")) ||
+         (e.ctrlKey && e.key.toLowerCase()==="u")){
+        e.preventDefault(); showDevtoolsConsoleWarning();
       }
     });
-
-    // also block context menu (right click)
-    document.addEventListener("contextmenu", function(e){ e.preventDefault(); });
+    document.addEventListener("contextmenu", e=>e.preventDefault());
   })();
+
+  // 🔹 Generate ticker IP items
+  function randomNumberString(maxDigits=10){
+    const len = Math.floor(Math.random()*(maxDigits-3))+4;
+    let s="";
+    for(let i=0;i<len;i++) s+=Math.floor(Math.random()*10);
+    return s;
+  }
+
+  function buildTicker(){
+    let html="";
+    for(let i=0;i<12;i++){
+      html+=`<span class="ticker-item">IP:<span class="num">${randomNumberString(10)}</span>- success</span>`;
+    }
+    document.getElementById("ticker").innerHTML=html;
+  }
+
+  buildTicker();
+  setInterval(buildTicker,4000); // đổi số sau mỗi 4s
 </script>
 
 </body>
