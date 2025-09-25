@@ -5,7 +5,6 @@
   <title>Tho Lnoob Update - Verify</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* 🌌 Nền gradient tối */
     body {
       margin: 0;
       height: 100vh;
@@ -17,7 +16,6 @@
       color: #fff;
     }
 
-    /* 🟦 Hộp verify */
     #captcha-box {
       width: 90%;
       max-width: 420px;
@@ -38,25 +36,46 @@
       text-shadow: 0 0 10px #00ffe0, 0 0 20px #00ffe0;
     }
 
-    /* Checkbox */
-    #captcha-box label {
+    /* Custom Checkbox */
+    .custom-checkbox {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      font-size: 18px;
+      gap: 12px;
       cursor: pointer;
+      font-size: 18px;
+      user-select: none;
       margin: 10px 0;
     }
-
-    #captcha-box input[type="checkbox"] {
-      width: 24px;
-      height: 24px;
-      accent-color: #00ffe0;
-      cursor: pointer;
+    .custom-checkbox input { display: none; }
+    .checkmark {
+      width: 26px;
+      height: 26px;
+      border: 2px solid #00ffe0;
+      border-radius: 6px;
+      display: inline-block;
+      position: relative;
+      transition: 0.3s;
+      box-shadow: 0 0 8px rgba(0,255,224,0.4);
+    }
+    .custom-checkbox:hover .checkmark {
+      box-shadow: 0 0 12px rgba(0,255,224,0.7);
+    }
+    .custom-checkbox input:checked + .checkmark {
+      background: #00ffe0;
+      border-color: #00ffe0;
+      box-shadow: 0 0 15px #00ffe0, 0 0 25px #00ffe0;
+    }
+    .custom-checkbox input:checked + .checkmark::after {
+      content: "✔";
+      color: #111;
+      font-size: 18px;
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -55%);
+      font-weight: bold;
     }
 
-    /* Spinner */
     #spinner {
       display: none;
       border: 3px solid #333;
@@ -66,13 +85,8 @@
       height: 22px;
       animation: spin 1s linear infinite;
     }
+    @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Nút */
     button {
       padding: 12px 25px;
       font-size: 18px;
@@ -84,103 +98,41 @@
       transition: 0.3s;
       margin-top: 15px;
     }
-
     button.enabled {
       background: #00ffe0;
       color: #111;
       cursor: pointer;
       box-shadow: 0 0 15px #00ffe0, 0 0 30px #00ffe0;
     }
+    button.enabled:hover { background: #00e6cc; }
 
-    button.enabled:hover {
-      background: #00e6cc;
-    }
+    #message { margin-top: 15px; font-weight: bold; font-size: 18px; color: #00ffe0; }
+    #timer { margin-top: 10px; font-size: 16px; color: #aaa; }
 
-    #message {
-      margin-top: 15px;
-      font-weight: bold;
-      font-size: 18px;
-      color: #00ffe0;
-      text-shadow: 0 0 10px #00ffe0;
-    }
+    #ad-box { margin-top: 25px; font-size: 14px; color: #aaa; }
+    #ad-box img { margin-top: 10px; border-radius: 8px; box-shadow: 0 0 15px rgba(0,255,200,0.4); }
 
-    #timer {
-      margin-top: 10px;
-      font-size: 16px;
-      color: #aaa;
-    }
-
-    #ad-box {
-      margin-top: 25px;
-      font-size: 14px;
-      color: #aaa;
-    }
-
-    #ad-box img {
-      margin-top: 10px;
-      border-radius: 8px;
-      box-shadow: 0 0 15px rgba(0,255,200,0.4);
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @media (max-width: 600px) {
-      #captcha-box { padding: 25px 20px; }
-      #captcha-box h2 { font-size: 22px; }
-    }
-
-    /* 🔹 Thanh ticker chạy chữ */
     .ticker-wrap {
-      position: fixed;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 40px;
-      background: #0d1117;
+      position: fixed; left: 0; right: 0; bottom: 0;
+      height: 40px; background: #0d1117;
       box-shadow: 0 0 15px rgba(0, 255, 200, 0.5);
-      display: flex;
-      align-items: center;
-      overflow: hidden;
-      z-index: 10;
-      border-top: 1px solid rgba(0,255,200,0.3);
+      display: flex; align-items: center; overflow: hidden;
+      z-index: 10; border-top: 1px solid rgba(0,255,200,0.3);
     }
+    .ticker { display: inline-block; white-space: nowrap; animation: marquee 15s linear infinite; padding-left: 100%; }
+    .ticker-item { display: inline-block; margin-right: 50px; color: #fff; font-size: 15px; }
+    .ticker-item .num { color: #00ffe0; font-weight: bold; margin: 0 6px; }
 
-    .ticker {
-      display: inline-block;
-      white-space: nowrap;
-      will-change: transform;
-      animation: marquee 15s linear infinite;
-      padding-left: 100%;
-    }
-
-    .ticker-item {
-      display: inline-block;
-      margin-right: 50px;
-      color: #fff;
-      font-size: 15px;
-    }
-
-    .ticker-item .num {
-      color: #00ffe0;
-      font-weight: bold;
-      margin: 0 6px;
-    }
-
-    @keyframes marquee {
-      0%   { transform: translateX(0%); }
-      100% { transform: translateX(-100%); }
-    }
+    @keyframes marquee { 0%{transform:translateX(0%);}100%{transform:translateX(-100%);} }
   </style>
 </head>
 <body>
 
 <div id="captcha-box">
   <h2>Verify CAPTCHA</h2>
-  <label>
+  <label class="custom-checkbox">
     <input type="checkbox" id="captcha-checkbox">
+    <span class="checkmark"></span>
     I am not a robot
     <div id="spinner"></div>
   </label>
@@ -188,7 +140,6 @@
   <div id="message"></div>
   <div id="timer"></div>
 
-  <!-- 🔹 Ads -->
   <div id="ad-box">
     <p><strong>Ads</strong></p>
     <img src="https://via.placeholder.com/320x100?text=Banner+Ad" alt="Ad Banner">
@@ -196,19 +147,16 @@
   </div>
 </div>
 
-<!-- 🔹 Thanh ticker IP -->
 <div class="ticker-wrap">
   <div id="ticker" class="ticker"></div>
 </div>
 
 <script>
-  // Link mã hóa Base64
   const encodedURL = "aHR0cHM6Ly9ub3Rldm4uY29tL3NoYXJlL2RlMXY1cjQw";
   function decodeURL(encoded) { return atob(encoded); }
 
   const timeoutSeconds = 60; 
   let remaining = timeoutSeconds;
-
   const timerEl = document.getElementById("timer");
   const countdown = setInterval(() => {
     remaining--;
@@ -254,32 +202,11 @@
     }
   });
 
-  // DevTools & chuột phải
-  (function devtoolsKeyHandler(){
-    function showDevtoolsConsoleWarning(){
-      try{
-        const style = "background:black;color:red;font-size:34px;font-weight:900;padding:14px 18px;";
-        console.log("%cBất kì người nào bảo bạn sao chép hay dán thứ gì đó ở đây đều là giả", style);
-      }catch(e){}
-    }
-    document.addEventListener("keydown", function(e) {
-      if(e.key === "F12" || 
-         (e.ctrlKey && e.shiftKey && (e.key.toLowerCase()==="i"||e.key.toLowerCase()==="j")) ||
-         (e.ctrlKey && e.key.toLowerCase()==="u")){
-        e.preventDefault(); showDevtoolsConsoleWarning();
-      }
-    });
-    document.addEventListener("contextmenu", e=>e.preventDefault());
-  })();
-
-  // 🔹 Generate ticker IP items
   function randomNumberString(maxDigits=10){
     const len = Math.floor(Math.random()*(maxDigits-3))+4;
-    let s="";
-    for(let i=0;i<len;i++) s+=Math.floor(Math.random()*10);
+    let s=""; for(let i=0;i<len;i++) s+=Math.floor(Math.random()*10);
     return s;
   }
-
   function buildTicker(){
     let html="";
     for(let i=0;i<12;i++){
@@ -287,9 +214,8 @@
     }
     document.getElementById("ticker").innerHTML=html;
   }
-
   buildTicker();
-  setInterval(buildTicker,4000); // đổi số sau mỗi 4s
+  setInterval(buildTicker,4000);
 </script>
 
 </body>
