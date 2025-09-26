@@ -222,24 +222,24 @@
   // ===============================
   document.addEventListener("contextmenu", function(e) {
     e.preventDefault();
-    alert("🚫 Chuột phải đã bị vô hiệu hoá!");
+    alert("🚫");
   });
 
   document.onkeydown = function(e) {
     if (e.keyCode == 123) { // F12
-      alert("🚫 DevTools bị chặn!");
+      alert("🚫");
       return false;
     }
     if (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) {
-      alert("🚫 DevTools bị chặn!");
+      alert("🚫");
       return false;
     }
     if (e.ctrlKey && e.keyCode == 85) { // Ctrl+U
-      alert("🚫 Không được xem source!");
+      alert("🚫");
       return false;
     }
     if (e.ctrlKey && e.keyCode == 83) { // Ctrl+S
-      alert("🚫 Không được lưu trang!");
+      alert("🚫");
       return false;
     }
   };
