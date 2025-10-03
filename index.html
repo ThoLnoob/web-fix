@@ -120,8 +120,14 @@
       z-index: 10; border-top: 1px solid rgba(0,255,200,0.3);
     }
     .ticker { display: inline-block; white-space: nowrap; animation: marquee 15s linear infinite; padding-left: 100%; }
-    .ticker-item { display: inline-block; margin-right: 50px; color: #fff; font-size: 15px; }
-    .ticker-item .num { color: #00ffe0; font-weight: bold; margin: 0 6px; }
+    .ticker-item { 
+      display: inline-block; 
+      margin-right: 60px; 
+      font-size: 16px; 
+      font-weight: bold; 
+      color: #00ffe0;
+      text-shadow: 0 0 8px #00ffe0, 0 0 15px rgba(0,255,200,0.7);
+    }
 
     @keyframes marquee { 0%{transform:translateX(0%);}100%{transform:translateX(-100%);} }
   </style>
@@ -147,8 +153,15 @@
   </div>
 </div>
 
+<!-- 🔹 Thanh ticker chữ -->
 <div class="ticker-wrap">
-  <div id="ticker" class="ticker"></div>
+  <div id="ticker" class="ticker">
+    <span class="ticker-item">✨ An toàn</span>
+    <span class="ticker-item">⚡ Dễ sử dụng</span>
+    <span class="ticker-item">💎 Uy tín</span>
+    <span class="ticker-item">🌟 Chất lượng</span>
+    <span class="ticker-item">🚀 Nhanh gọn</span>
+  </div>
 </div>
 
 <script>
@@ -201,21 +214,6 @@
       }, 3000);
     }
   });
-
-  function randomNumberString(maxDigits=10){
-    const len = Math.floor(Math.random()*(maxDigits-3))+4;
-    let s=""; for(let i=0;i<len;i++) s+=Math.floor(Math.random()*10);
-    return s;
-  }
-  function buildTicker(){
-    let html="";
-    for(let i=0;i<12;i++){
-      html+=`<span class="ticker-item">ID:<span class="num*****">${randomNumberString(10)}</span>- success</span>`;
-    }
-    document.getElementById("ticker").innerHTML=html;
-  }
-  buildTicker();
-  setInterval(buildTicker,4000);
 
   // ===============================
   // 🔒 Chặn chuột phải + DevTools
