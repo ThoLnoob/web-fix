@@ -14,7 +14,7 @@
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       color: #fff;
-      overflow: hidden;
+      overflow-x: hidden;
     }
 
     #captcha-box {
@@ -132,104 +132,85 @@
 
     @keyframes marquee { 0%{transform:translateX(0%);}100%{transform:translateX(-100%);} }
 
-    /* 🌈 Floating Menu */
-    #floating-menu {
+    /* 🌈 Nút menu đổi màu */
+    .floating-menu {
       position: fixed;
-      top: 20px;
+      bottom: 80px;
       right: 20px;
-      background: linear-gradient(270deg, #00ffe0, #00aaff, #00ffe0);
-      background-size: 400% 400%;
-      animation: gradientShift 5s infinite alternate;
-      color: #111;
+      z-index: 99;
+      background: linear-gradient(45deg, #00ffe0, #00b7ff, #8f00ff);
+      background-size: 300% 300%;
+      animation: colorShift 4s infinite;
+      width: 55px;
+      height: 55px;
       border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      box-shadow: 0 0 20px rgba(0,255,200,0.6);
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 26px;
       cursor: pointer;
-      z-index: 999;
-      font-size: 24px;
-      transition: transform 0.3s;
+      box-shadow: 0 0 20px rgba(0,255,255,0.8);
+      transition: transform 0.2s ease-in-out;
     }
-    #floating-menu:hover {
-      transform: scale(1.1);
-    }
-
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 100% 50%; }
+    .floating-menu:hover { transform: scale(1.1); }
+    @keyframes colorShift {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
     }
 
-    #menu-content {
+    /* 📜 Menu trượt mượt */
+    .menu-content {
       position: fixed;
-      top: 80px;
+      bottom: 150px;
       right: 20px;
-      background: #0d1117;
-      border: 1px solid rgba(0,255,200,0.4);
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0,255,200,0.4);
+      background: rgba(13,17,23,0.95);
+      border: 1px solid rgba(0,255,255,0.4);
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,255,200,0.7);
       padding: 10px 15px;
-      display: none;
-      z-index: 998;
       width: 200px;
+      overflow: hidden;
+      transform: translateY(30px);
+      opacity: 0;
+      transition: all 0.4s ease;
+      pointer-events: none;
+    }
+    .menu-content.show {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
     }
 
-    #menu-content p {
-      margin: 8px 0;
-      font-size: 16px;
+    .menu-item {
       color: #00ffe0;
       font-weight: bold;
       cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    #menu-content p:hover {
-      text-shadow: 0 0 10px #00ffe0;
+      margin: 10px 0;
     }
 
     .submenu {
-      display: none;
-      margin-left: 15px;
+      margin-left: 10px;
       font-size: 14px;
+      display: none;
+    }
+    .submenu a, .submenu button {
       color: #fff;
-    }
-
-    .submenu button {
       background: #00ffe0;
-      color: #111;
-      border: none;
       padding: 5px 10px;
-      border-radius: 5px;
+      border-radius: 6px;
+      text-decoration: none;
+      border: none;
       cursor: pointer;
-      box-shadow: 0 0 10px #00ffe0;
+      display: inline-block;
+      margin-top: 5px;
+      transition: 0.2s;
     }
-
-    .submenu button:hover {
-      background: #00e6cc;
-    }
-
+    .submenu button:hover, .submenu a:hover { background: #00e6cc; }
   </style>
 </head>
 <body>
-
-<!-- 🌟 Floating Menu -->
-<div id="floating-menu">☰</div>
-
-<div id="menu-content">
-  <p id="help-option">Need Help? <span>▼</span></p>
-  <div class="submenu" id="help-submenu">
-    <button onclick="window.open('https://discord.com/invite/aa2d6gjNv4','_blank')">Join Discord</button>
-  </div>
-
-  <p id="repair-option">Repair Error <span>▼</span></p>
-  <div class="submenu" id="repair-submenu">
-    <button onclick="location.reload()">Click Here</button>
-  </div>
-</div>
 
 <div id="captcha-box">
   <h2>Verify CAPTCHA</h2>
@@ -250,7 +231,7 @@
   </div>
 </div>
 
-<!-- 🔹 Thanh ticker chữ -->
+<!-- 🔹 Thanh chữ chạy -->
 <div class="ticker-wrap">
   <div id="ticker" class="ticker">
     <span class="ticker-item">✨ An toàn</span>
@@ -261,28 +242,23 @@
   </div>
 </div>
 
+<!-- 🌈 Nút menu -->
+<div class="floating-menu" id="menuBtn">☰</div>
+<div class="menu-content" id="menuBox">
+  <div class="menu-item" onclick="toggleSub('help')">💬 Need Help?</div>
+  <div class="submenu" id="help">
+    <a href="https://discord.com/invite/aa2d6gjNv4" target="_blank">Join Discord</a>
+  </div>
+  <div class="menu-item" onclick="toggleSub('repair')">🛠 Repair Error</div>
+  <div class="submenu" id="repair">
+    <button onclick="repairSystem()">Click Here</button>
+  </div>
+</div>
+
 <script>
-  // ===== Menu Toggle =====
-  const menu = document.getElementById('floating-menu');
-  const menuContent = document.getElementById('menu-content');
-  menu.onclick = () => {
-    menuContent.style.display = menuContent.style.display === 'block' ? 'none' : 'block';
-  };
-
-  document.getElementById('help-option').onclick = () => {
-    const submenu = document.getElementById('help-submenu');
-    submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
-  };
-
-  document.getElementById('repair-option').onclick = () => {
-    const submenu = document.getElementById('repair-submenu');
-    submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
-  };
-
-  // ===== Captcha =====
+  // Verify logic gốc
   const encodedURL = "aHR0cHM6Ly9ub3Rldm4uY29tL3NoYXJlL2RlMXY1cjQw";
-  function decodeURL(encoded) { return atob(encoded); }
-
+  const decodeURL = atob(encodedURL);
   const timeoutSeconds = 60; 
   let remaining = timeoutSeconds;
   const timerEl = document.getElementById("timer");
@@ -325,21 +301,49 @@
       clearInterval(countdown);
       message.textContent = "Wait 3 seconds...";
       setTimeout(() => {
-        window.location.href = decodeURL(encodedURL);
+        window.location.href = decodeURL;
       }, 3000);
     }
   });
 
-  // ===== Block Keys =====
+  // Chống DevTools
   document.addEventListener("contextmenu", e => e.preventDefault());
-  document.onkeydown = function(e) {
-    if (e.keyCode == 123 || 
-        (e.ctrlKey && e.shiftKey && [73, 74, 67].includes(e.keyCode)) ||
-        (e.ctrlKey && [85, 83].includes(e.keyCode))) {
+  document.onkeydown = e => {
+    if (e.keyCode == 123 || (e.ctrlKey && e.shiftKey && [73,74,67].includes(e.keyCode)) || (e.ctrlKey && [85,83].includes(e.keyCode))) {
       alert("🚫");
       return false;
     }
   };
+
+  // Menu hiệu ứng
+  const menuBtn = document.getElementById("menuBtn");
+  const menuBox = document.getElementById("menuBox");
+  menuBtn.onclick = () => menuBox.classList.toggle("show");
+
+  function toggleSub(id){
+    const el = document.getElementById(id);
+    el.style.display = el.style.display === "block" ? "none" : "block";
+  }
+
+  // Repair
+  function repairSystem(){
+    alert("🔧 Đang khởi động lại để sửa lỗi...");
+    setTimeout(() => {
+      try {
+        const elements = [checkbox, verifyBtn, spinner, timerEl];
+        let faulty = elements.some(el => !el);
+        if(faulty){
+          alert("⚠ Phát hiện lỗi, đang khởi động lại...");
+          location.reload();
+        } else {
+          alert("✅ Hệ thống ổn định, không phát hiện lỗi.");
+        }
+      } catch(e){
+        alert("⚠ Có lỗi bất thường, đang khởi động lại...");
+        location.reload();
+      }
+    }, 2000);
+  }
 </script>
 
 </body>
