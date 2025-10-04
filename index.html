@@ -1,157 +1,249 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sever crash</title>
+  <meta charset="UTF-8">
+  <title>Tho Lnoob Update - Verify</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    :root{
-      --bg:#0b0f12;
-      --card:#0f1417;
-      --red:#ff3b3b;
-      --muted:#bfc9cf;
-    }
-    html,body{
-      height:100%;
-      margin:0;
-    }
-    body{
-      background: radial-gradient(circle at 20% 20%, rgba(255,59,59,0.04), transparent 10%),
-                  linear-gradient(180deg, #07090a 0%, var(--bg) 100%);
-      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      color:var(--muted);
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #fff;
     }
 
-    .wrap{
-      width:100%;
-      max-width:900px;
-      text-align:center;
-      background: transparent;
-      padding: 8vh 20px;
-      box-sizing:border-box;
+    #captcha-box {
+      width: 90%;
+      max-width: 420px;
+      padding: 30px;
+      background: #0d1117;
+      border-radius: 15px;
+      box-shadow: 0 0 25px rgba(0, 255, 200, 0.7);
+      text-align: center;
+      animation: fadeIn 1s ease-in-out;
+      z-index: 2;
     }
 
-    .title {
-      color: var(--red);
-      font-weight: 800;
-      /* responsive big text */
-      font-size: clamp(36px, 9vw, 120px);
-      line-height: 0.95;
-      margin: 0 0 18px 0;
-      text-shadow: 0 6px 30px rgba(255,59,59,0.12), 0 2px 6px rgba(0,0,0,0.6);
-      letter-spacing: -1px;
+    #captcha-box h2 {
+      margin-bottom: 20px;
+      font-size: 26px;
+      font-weight: bold;
+      color: #00ffe0;
+      text-shadow: 0 0 10px #00ffe0, 0 0 20px #00ffe0;
     }
 
-    .subtitle {
-      color: #d9e6ea;
-      font-size: clamp(14px, 2.2vw, 20px);
-      margin: 0 auto;
-      max-width: 860px;
-      opacity: .95;
-    }
-
-    /* Small helper for accessibility / mobile */
-    .note {
-      margin-top:22px;
-      color:#99a7ac;
-      font-size:13px;
-    }
-
-    /* Make sure nothing selectable if you want (optional) */
-    .no-select {
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
+    /* Custom Checkbox */
+    .custom-checkbox {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 18px;
       user-select: none;
+      margin: 10px 0;
+    }
+    .custom-checkbox input { display: none; }
+    .checkmark {
+      width: 26px;
+      height: 26px;
+      border: 2px solid #00ffe0;
+      border-radius: 6px;
+      display: inline-block;
+      position: relative;
+      transition: 0.3s;
+      box-shadow: 0 0 8px rgba(0,255,224,0.4);
+    }
+    .custom-checkbox:hover .checkmark {
+      box-shadow: 0 0 12px rgba(0,255,224,0.7);
+    }
+    .custom-checkbox input:checked + .checkmark {
+      background: #00ffe0;
+      border-color: #00ffe0;
+      box-shadow: 0 0 15px #00ffe0, 0 0 25px #00ffe0;
+    }
+    .custom-checkbox input:checked + .checkmark::after {
+      content: "✔";
+      color: #111;
+      font-size: 18px;
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -55%);
+      font-weight: bold;
     }
 
-    /* Centering on tiny screens */
-    @media (max-height:520px){
-      .wrap { padding:28px 12px; }
-      .note{ font-size:12px; }
+    #spinner {
+      display: none;
+      border: 3px solid #333;
+      border-top: 3px solid #00ffe0;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      animation: spin 1s linear infinite;
     }
+    @keyframes spin { 0% { transform: rotate(0deg);} 100% { transform: rotate(360deg);} }
+
+    button {
+      padding: 12px 25px;
+      font-size: 18px;
+      border: none;
+      border-radius: 8px;
+      background: grey;
+      color: white;
+      cursor: not-allowed;
+      transition: 0.3s;
+      margin-top: 15px;
+    }
+    button.enabled {
+      background: #00ffe0;
+      color: #111;
+      cursor: pointer;
+      box-shadow: 0 0 15px #00ffe0, 0 0 30px #00ffe0;
+    }
+    button.enabled:hover { background: #00e6cc; }
+
+    #message { margin-top: 15px; font-weight: bold; font-size: 18px; color: #00ffe0; }
+    #timer { margin-top: 10px; font-size: 16px; color: #aaa; }
+
+    #ad-box { margin-top: 25px; font-size: 14px; color: #aaa; }
+    #ad-box img { margin-top: 10px; border-radius: 8px; box-shadow: 0 0 15px rgba(0,255,200,0.4); }
+
+    .ticker-wrap {
+      position: fixed; left: 0; right: 0; bottom: 0;
+      height: 40px; background: #0d1117;
+      box-shadow: 0 0 15px rgba(0, 255, 200, 0.5);
+      display: flex; align-items: center; overflow: hidden;
+      z-index: 10; border-top: 1px solid rgba(0,255,200,0.3);
+    }
+    .ticker { display: inline-block; white-space: nowrap; animation: marquee 15s linear infinite; padding-left: 100%; }
+    .ticker-item { display: inline-block; margin-right: 50px; color: #fff; font-size: 15px; }
+    .ticker-item .num { color: #00ffe0; font-weight: bold; margin: 0 6px; }
+
+    @keyframes marquee { 0%{transform:translateX(0%);}100%{transform:translateX(-100%);} }
   </style>
 </head>
 <body>
-  <main class="wrap no-select" role="main" aria-labelledby="title">
-    <h1 id="title" class="title">Sever Crash</h1>
-    <p class="subtitle">The server is down, please wait for the developer or contact the developer to fix.</p>
-  </main>
 
-  <script>
-    // Prevent right-click
-    document.addEventListener('contextmenu', function(e){
-      e.preventDefault();
-    });
+<div id="captcha-box">
+  <h2>Verify CAPTCHA</h2>
+  <label class="custom-checkbox">
+    <input type="checkbox" id="captcha-checkbox">
+    <span class="checkmark"></span>
+    I am not a robot
+    <div id="spinner"></div>
+  </label>
+  <button id="verify-btn" disabled>Continue</button>
+  <div id="message"></div>
+  <div id="timer"></div>
 
-    // Prevent common DevTools / view-source / save shortcuts
-    document.addEventListener('keydown', function(e){
-      // F12
-      if (e.key === 'F12' || e.keyCode === 123) {
-        e.preventDefault();
-        return false;
-      }
+  <div id="ad-box">
+    <p><strong>Ads</strong></p>
+    <img src="https://via.placeholder.com/320x100?text=Banner+Ad" alt="Ad Banner">
+    <p>©Made by Tho Lnoob</p>
+  </div>
+</div>
 
-      // Ctrl+Shift+I / Ctrl+Shift+J / Ctrl+Shift+C (DevTools)
-      if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
-        e.preventDefault();
-        return false;
-      }
+<div class="ticker-wrap">
+  <div id="ticker" class="ticker"></div>
+</div>
 
-      // Ctrl+U (view-source)
-      if (e.ctrlKey && (e.key === 'u' || e.key === 'U')) {
-        e.preventDefault();
-        return false;
-      }
+<script>
+  const encodedURL = "aHR0cHM6Ly9ub3Rldm4uY29tL3NoYXJlL2RlMXY1cjQw";
+  function decodeURL(encoded) { return atob(encoded); }
 
-      // Ctrl+S (save)
-      if (e.ctrlKey && (e.key === 's' || e.key === 'S')) {
-        e.preventDefault();
-        return false;
-      }
+  const timeoutSeconds = 60; 
+  let remaining = timeoutSeconds;
+  const timerEl = document.getElementById("timer");
+  const countdown = setInterval(() => {
+    remaining--;
+    timerEl.textContent = "expires later: " + remaining + " Seconds";
+    if(remaining <= 0){
+      clearInterval(countdown);
+      alert("Captcha expired. Please reload the page to re-authenticate.");
+      location.reload();
+    }
+  }, 1000);
 
-      // Ctrl+Shift+K (Firefox Web Console)
-      if (e.ctrlKey && e.shiftKey && (e.key === 'K' || e.key === 'k')) {
-        e.preventDefault();
-        return false;
-      }
+  const checkbox = document.getElementById("captcha-checkbox");
+  const spinner = document.getElementById("spinner");
+  const verifyBtn = document.getElementById("verify-btn");
+  const message = document.getElementById("message");
 
-      // Ctrl+Shift+C (inspect element also covered), Ctrl+Shift+P (cmd palette)
-      if (e.ctrlKey && e.shiftKey && (e.key === 'P' || e.key === 'p')) {
-        e.preventDefault();
-        return false;
-      }
-    }, {passive:false});
+  checkbox.addEventListener("change", function() {
+    if(checkbox.checked){
+      spinner.style.display = "inline-block"; 
+      checkbox.disabled = true;
+      verifyBtn.disabled = true;
+      verifyBtn.classList.remove("enabled");
+      setTimeout(() => {
+        spinner.style.display = "none"; 
+        checkbox.disabled = false;
+        verifyBtn.disabled = false;
+        verifyBtn.classList.add("enabled");
+      }, 2000);
+    } else {
+      verifyBtn.disabled = true;
+      verifyBtn.classList.remove("enabled");
+    }
+  });
 
-    // Optional: simple detection of opened devtools — non-perfect, works in many browsers
-    (function detectDevTools(){
-      let devtoolsOpen = false;
-      const threshold = 160;
-      function check(){
-        const widthDiff = window.outerWidth - window.innerWidth;
-        const heightDiff = window.outerHeight - window.innerHeight;
-        if (widthDiff > threshold || heightDiff > threshold) {
-          if (!devtoolsOpen) {
-            devtoolsOpen = true;
-            // action when devtools detected: log and optionally show message
-            console.log('%cDevTools detected', 'color: orange; font-weight: 700;');
-            // you could add further behavior here (e.g. hide content), but avoid destructive actions
-          }
-        } else {
-          devtoolsOpen = false;
-        }
-      }
-      // check periodically
-      setInterval(check, 1000);
-      // also check on resize
-      window.addEventListener('resize', check);
-    })();
-  </script>
+  verifyBtn.addEventListener("click", () => {
+    if(verifyBtn.disabled) return;
+    if(checkbox.checked){
+      clearInterval(countdown);
+      message.textContent = "Wait 3 seconds...";
+      setTimeout(() => {
+        window.location.href = decodeURL(encodedURL);
+      }, 3000);
+    }
+  });
+
+  function randomNumberString(maxDigits=10){
+    const len = Math.floor(Math.random()*(maxDigits-3))+4;
+    let s=""; for(let i=0;i<len;i++) s+=Math.floor(Math.random()*10);
+    return s;
+  }
+  function buildTicker(){
+    let html="";
+    for(let i=0;i<12;i++){
+      html+=`<span class="ticker-item">ID:<span class="num*****">${randomNumberString(10)}</span>- success</span>`;
+    }
+    document.getElementById("ticker").innerHTML=html;
+  }
+  buildTicker();
+  setInterval(buildTicker,4000);
+
+  // ===============================
+  // 🔒 Chặn chuột phải + DevTools
+  // ===============================
+  document.addEventListener("contextmenu", function(e) {
+    e.preventDefault();
+    alert("🚫");
+  });
+
+  document.onkeydown = function(e) {
+    if (e.keyCode == 123) { // F12
+      alert("🚫");
+      return false;
+    }
+    if (e.ctrlKey && e.shiftKey && (e.keyCode == 73 || e.keyCode == 74 || e.keyCode == 67)) {
+      alert("🚫");
+      return false;
+    }
+    if (e.ctrlKey && e.keyCode == 85) { // Ctrl+U
+      alert("🚫");
+      return false;
+    }
+    if (e.ctrlKey && e.keyCode == 83) { // Ctrl+S
+      alert("🚫");
+      return false;
+    }
+  };
+</script>
+
 </body>
 </html>
